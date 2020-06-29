@@ -1,26 +1,71 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Header from './Header/Header'
+import AppStyle from './App.css';
+import Paper from './Filtres/FIltre'
+import { makeStyles } from '@material-ui/core/styles';
+import Grid from '@material-ui/core/Grid';
+import Box from './Box/Box';
 
-function App() {
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+    maxWidth: '1500px',
+    marginRight:'auto',
+    marginLeft:'auto',
+  },
+  item:{
+    minWidth:'300px',
+  }
+}));
+export default function App() {
+
+  const classes = useStyles();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Header />
+     
+        <Grid className={classes.root} direction="row" justify="center" alignItems="center" container spacing={1}>
+          <Grid item xs={12} className={classes.item}  >
+            <Paper/>
+          </Grid>
+           <Grid item xs={12} sm={10} md={5} lg={3} >
+            <Box/>
+          </Grid>
+          <Grid item xs={12} sm={10} md={5} lg={6} >
+            <Box/>
+          </Grid>
+          <Grid item xs={12} sm={10} md={5} lg={3} >
+            <Box/>
+          </Grid>
+          {/* 2eme ligne*/}
+          
+           <Grid item xs={12} sm={10} md={5} lg={3} >
+            <Box/>
+          </Grid>
+          <Grid item xs={12} sm={10} md={5} lg={6} >
+            <Box/>
+          </Grid>
+          <Grid item xs={12} sm={10}  md={5} lg={3} >
+            <Box/>
+          </Grid>
+          {/* 2eme ligne*/}
+
+          <Grid item xs={12} sm={10} md={5} lg={3} >
+            <Box/>
+          </Grid>
+          <Grid item xs={12} sm={10} md={5} lg={6} >
+            <Box/>
+          </Grid>
+          <Grid item xs={12} sm={10} md={5} lg={3} >
+            <Box/>
+          </Grid>
+        </Grid>
+      
+
     </div>
   );
+
 }
 
-export default App;
