@@ -31,24 +31,24 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 /*------------------------creation données -------------------------*/
-function createData(Entreprise, Exposition, Secteur, key) {
-  return { Entreprise, Exposition, Secteur, key };
-}
+// function createData(Entreprise, Exposition, Secteur, key) {
+//   return { Entreprise, Exposition, Secteur, key };
+// }
 
-const rows = [
-  createData('RECKITT BENCKISER GROUP PLC', '3.37%', 'Activités des services financiers', 0),
-  createData('AIR LIQUIDE', '3.34%', 'Industrie chimique', 1),
-  createData('DNCA FINANCE LUXEMBOURG', '3.24%', 'DNCA FINANCE LUXEMBOURG', 3),
-  createData('RECKITT BENCKISER GROUP PLC', '3.37%', 'Activités des services financiers', 4),
-  createData('AIR LIQUIDE', '3.34%', 'Industrie chimique', 5),
-  createData('DNCA FINANCE LUXEMBOURG', '3.24%', 'DNCA FINANCE LUXEMBOURG', 6),
-  createData('AIR LIQUIDE', '3.34%', 'Industrie chimique', 7),
-  createData('DNCA FINANCE LUXEMBOURG', '3.24%', 'DNCA FINANCE LUXEMBOURG', 8),
-  createData('RECKITT BENCKISER GROUP PLC', '3.37%', 'Activités des services financiers', 9),
-  createData('AIR LIQUIDE', '3.34%', 'Industrie chimique', 10),
-  createData('DNCA FINANCE LUXEMBOURG', '3.24%', 'DNCA FINANCE LUXEMBOURG', 11),
-  createData('RECKITT BENCKISER GROUP PLC', '3.37%', 'Activités des services financiers', 12),
-];
+// const rows = [
+//   createData('RECKITT BENCKISER GROUP PLC', '3.37%', 'Activités des services financiers', 0),
+//   createData('AIR LIQUIDE', '3.34%', 'Industrie chimique', 1),
+//   createData('DNCA FINANCE LUXEMBOURG', '3.24%', 'DNCA FINANCE LUXEMBOURG', 3),
+//   createData('RECKITT BENCKISER GROUP PLC', '3.37%', 'Activités des services financiers', 4),
+//   createData('AIR LIQUIDE', '3.34%', 'Industrie chimique', 5),
+//   createData('DNCA FINANCE LUXEMBOURG', '3.24%', 'DNCA FINANCE LUXEMBOURG', 6),
+//   createData('AIR LIQUIDE', '3.34%', 'Industrie chimique', 7),
+//   createData('DNCA FINANCE LUXEMBOURG', '3.24%', 'DNCA FINANCE LUXEMBOURG', 8),
+//   createData('RECKITT BENCKISER GROUP PLC', '3.37%', 'Activités des services financiers', 9),
+//   createData('AIR LIQUIDE', '3.34%', 'Industrie chimique', 10),
+//   createData('DNCA FINANCE LUXEMBOURG', '3.24%', 'DNCA FINANCE LUXEMBOURG', 11),
+//   createData('RECKITT BENCKISER GROUP PLC', '3.37%', 'Activités des services financiers', 12),
+// ];
 
 function stringFyArray(array) {
   var jsonCountriesArray = {};
@@ -76,6 +76,8 @@ export default function App() {
   const [dataMaturity, setDataMaturity] = useState({ data: [0, 0, 0, 0, 0, 0, 0, 0, 0], labels: ['', '', '', '', '', '', '', '', ''] })
   const [dataCountreparties, setDataCountreparties] = useState([[], [[], []]]);
   const [filtreActif, setFiltreActif] = useState('')
+  const [filtreSecteur, setFiltreSecteur] = useState('')
+
   // cette fontion load les données de l'Array dataAactifs et les met dans la variable d'état dataActif (sans S)
   useEffect(() => {
     let fetchData = loadDataActif();
@@ -88,9 +90,7 @@ export default function App() {
     // ------Maturité Moyenne -------------------
 
     let fetchDataMaturity = calcul_Maturity_Moyenne();
-
     let fechtDataCountrepartie = create_Data_Countrepartie('6', true);
-
 
     /*-----------------------------------------*/
 
@@ -103,15 +103,27 @@ export default function App() {
     setDataCountreparties(fechtDataCountrepartie)
   }, dataActifs.data, dataSecteur.data);
 
-  // cette fonction gère les click sur Actif -----------------------------
-  const handelClickSecteur = (label) =>{
-    
+
+  //la fonction gère les clicks sur secteurs -------------------------------------
+  const handelClickSecteur = (label) => {
+    setFiltreSecteur(label)
+    let newData = new Array(dataSecteur.data.length);
+    let newlabels = new Array(dataSecteur.data.length);
+    // on complète par des '0'
+    newData.fill(0, 0, newData.length);
+    newlabels = dataSecteur.labels.slice(0);
+    newData.splice(dataSecteur.labels.indexOf(label), 1, dataSecteur.data[dataSecteur.labels.indexOf(label)]);
+    setDataSecteur({ data: newData, labels: newlabels });
   }
+
+  // cette fonction gère les click sur Actif -----------------------------
+
   const handelClickActif = (label) => {
     setFiltreActif(label)
     if (statut) {
       let newData = new Array(dataActifs.data.length);
       let newlabels = new Array(dataActifs.data.length);
+      // on complète par des '0'
       newData.fill(0, 0, newData.length);
       newlabels = dataActifs.labels.slice(0);
       newData.splice(dataActifs.labels.indexOf(label), 1, dataActifs.data[dataActifs.labels.indexOf(label)]);
@@ -139,7 +151,7 @@ export default function App() {
         setDataRating({ data: dataRatingFiltre[1], labels: dataRatingFiltre[0] })
       }
 
-      setStatut(false);
+
 
       let dataCountriesFiltre = filtreData(label, '7');
       let jsonDataCountries = stringFyArray(dataCountriesFiltre[0])
@@ -157,6 +169,7 @@ export default function App() {
       let fechtDataCountrepartieFiltre = create_Data_Countrepartie('6', true, label);
       setDataCountreparties(fechtDataCountrepartieFiltre)
 
+      setStatut(false);
     } else {
       setFiltreActif('')
       setDataActif(dataActifs);
@@ -188,14 +201,14 @@ export default function App() {
       <Header />
       <Grid className={classes.root} direction="row" justify="center" alignItems="center" container spacing={1}>
         <Grid item xs={12} className={classes.item}  >
-          <Paper labelAactif={filtreActif}  handelClickActif={handelClickActif}/>
+          <Paper labelAactif={filtreActif} handelClickActif={handelClickActif} />
         </Grid>
         <Grid item xs={12} sm={10} md={5} lg={3} >
           {dataActifs.data.length > 0 ? <Box Tittle={'Classes d\'Actifs'} content={<DoughnutChart datas={dataActif} handelClickActif={handelClickActif} />} /> : <Box Tittle={'... Data Loading'} />}
 
         </Grid>
         <Grid item xs={12} sm={10} md={5} lg={6} >
-          {dataSecteur.data.length > 0 ? <Box Tittle={'Top 5 des secteurs d\'Activités'} content={<Barchart datas={dataSecteur}  handelClickSecteur={ handelClickSecteur} />} /> : <Box Tittle={'... Data Loading'} />}
+          {dataSecteur.data.length > 0 ? <Box Tittle={'Top 5 des secteurs d\'Activités'} content={<Barchart datas={dataSecteur} handelClickSecteur={handelClickSecteur} />} /> : <Box Tittle={'... Data Loading'} />}
         </Grid>
         <Grid item xs={12} sm={10} md={5} lg={3} >
           <Box Tittle={'SCR Marché'} content={<ScrRatingChart SCRMarche={80} SCRAction={50} SCRTaux={20} SCRDevise={80} SCRContrepartie={90} />} />
@@ -218,7 +231,7 @@ export default function App() {
           <Box Tittle={'Maturité Moyenne'} content={<MaturityBarChart data={dataMaturity.data} labels={dataMaturity.labels} />} />
         </Grid>
         <Grid item xs={12} sm={10} md={5} lg={6} >
-          <Box Tittle={'Contreparties'} content={<CountrepartieTable data={rows} datas={dataCountreparties} />} />
+          <Box Tittle={'Contreparties'} content={<CountrepartieTable datas={dataCountreparties} />} />
         </Grid>
         <Grid item xs={12} sm={10} md={5} lg={3} >
           <Box Tittle={'Risque Climatique'} />
