@@ -24,7 +24,7 @@ const Header = () => {
             </ul>
 
             <button className={headerStyleSheet.button} onClick={() => handelclick()}> <MenuIcon /></button>
-            <Horloge />
+            {/* <Horloge /> */}
         </header>
 
     );

@@ -80,6 +80,8 @@
         color: rgb(23,32,45); 
         width: 50vw;
         display: none;
+        z-index: 5;
+        
     }
    
     .nav_links_active{
