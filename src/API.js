@@ -143,12 +143,12 @@ export const creatData = (DataIndex, slice) => {
     return [keys, values]
 }
 
-export const filtreData = (filtre, DataIndex) => {
+export const filtreData = (filtreActif, DataIndex, indiceFiltre) => {
     let map = new Map();
     let somme = 0;
     let dataSecteur = dataBrut.filter((row) => {
         somme = somme + parseFloat(row[3]);
-        if (row[1] === filtre) {
+        if (row[indiceFiltre ? parseInt(indiceFiltre) : 1] === filtreActif) {
             return row
         }
     })
@@ -170,8 +170,6 @@ export const filtreData = (filtre, DataIndex) => {
     values = values.slice(0, 5);
 
     return [keys, values]
-
-
 }
 
 
@@ -203,15 +201,15 @@ export const calcul_Maturity_Moyenne = () => {
 }
 
 
-export const create_Data_Countrepartie = (DataIndex, slice, filtre) => {
+export const create_Data_Countrepartie = (DataIndex, slice, filtre, indiceFiltreActif) => {
     let map = new Map();
     let somme = 0;
     let dataActif = dataBrut.map((row, index) => {
         somme = somme + parseFloat(row[3]);
         if (filtre) {
-            if (filtre === row[1] && map.has(row[parseInt(DataIndex)])) {
+            if (filtre === row[indiceFiltreActif ? parseInt(indiceFiltreActif) : 1] && map.has(row[parseInt(DataIndex)])) {
                 map.set(row[parseInt(DataIndex)], [map.get(row[parseInt(DataIndex)])[0] + parseFloat(row[3]), row[8]])
-            } else if (filtre === row[1]) {
+            } else if (filtre === row[indiceFiltreActif ? parseInt(indiceFiltreActif) : 1]) {
                 map.set(row[parseInt(DataIndex)], [parseFloat(row[3]), row[8]])
             }
         } else
@@ -222,7 +220,6 @@ export const create_Data_Countrepartie = (DataIndex, slice, filtre) => {
             }
     })
     //   
-
     const mapSorted = new Map([...map.entries()].sort((a, b) => b[1][0] - a[1][0]));
     let values = Array.from(mapSorted.values());
     // console.log(somme);

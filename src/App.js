@@ -70,6 +70,7 @@ export default function App() {
   const [dataActifs, setDataActifs] = useState({ data: [0, 0, 0], labels: ['', '', ''] });
   const [dataActif, setDataActif] = useState({ data: [0, 0, 0], labels: ['', '', ''] });
   const [statut, setStatut] = useState(true);
+  const [statutSecteur, setStatutSecteur] = useState(true);
   const [dataSecteur, setDataSecteur] = useState({ data: [0, 0, 0, 0, 0], labels: ['', '', '', '', ''] })
   const [dataRating, setDataRating] = useState({ data: [0, 0, 0, 0, 0], labels: ['', '', '', '', ''] })
   const [dataCountries, setDataCountries] = useState({})
@@ -86,14 +87,10 @@ export default function App() {
     /* données sur les pays--------------------*/
     let fetchDataCountries = creatData('7', true);
     let jsonDataCountries = stringFyArray(fetchDataCountries[0])
-
     // ------Maturité Moyenne -------------------
-
     let fetchDataMaturity = calcul_Maturity_Moyenne();
     let fechtDataCountrepartie = create_Data_Countrepartie('6', true);
-
     /*-----------------------------------------*/
-
     setDataActifs({ data: fetchData[1], labels: fetchData[0] })
     setDataActif({ data: fetchData[1], labels: fetchData[0] })
     setDataSecteur({ data: fetchDataSecteur[1], labels: fetchDataSecteur[0] })
@@ -102,18 +99,74 @@ export default function App() {
     setDataMaturity({ data: fetchDataMaturity[0], labels: fetchDataMaturity[1] })
     setDataCountreparties(fechtDataCountrepartie)
   }, dataActifs.data, dataSecteur.data);
-
+  //-------------------------Fonction-----------------------------------------------------
+  const completLeTableauParDesZero = (array, length) => {
+    if (array[1].length < length) {
+      let i;
+      for (i = array[1].length; i <= length; i++) {
+        array[1][i] = 0;
+        array[0][i] = '';
+      }
+      return array;
+    } else {
+      return array
+    }
+  }
 
   //la fonction gère les clicks sur secteurs -------------------------------------
-  const handelClickSecteur = (label) => {
-    setFiltreSecteur(label)
+  const handelClickSecteur = (labelSecteur) => {
+    setFiltreSecteur(labelSecteur)
+
     let newData = new Array(dataSecteur.data.length);
     let newlabels = new Array(dataSecteur.data.length);
     // on complète par des '0'
     newData.fill(0, 0, newData.length);
     newlabels = dataSecteur.labels.slice(0);
-    newData.splice(dataSecteur.labels.indexOf(label), 1, dataSecteur.data[dataSecteur.labels.indexOf(label)]);
+    newData.splice(dataSecteur.labels.indexOf(labelSecteur), 1, dataSecteur.data[dataSecteur.labels.indexOf(labelSecteur)]);
     setDataSecteur({ data: newData, labels: newlabels });
+    if (statut) {
+      if (statutSecteur) {
+        let dataSecteurFiltre = completLeTableauParDesZero(filtreData(labelSecteur, '8', '8'), 4);
+        setDataSecteur({ data: dataSecteurFiltre[1], labels: dataSecteurFiltre[0] });
+
+        let dataRatingFiltre = completLeTableauParDesZero(filtreData(labelSecteur, '9', '8'), 4);
+        setDataRating({ data: dataRatingFiltre[1], labels: dataRatingFiltre[0] })
+        // --------------------Données Géographique ----------------------------------------------- --------------------
+        let dataCountriesFiltre = filtreData(labelSecteur, '7', '8');
+        let jsonDataCountries = stringFyArray(dataCountriesFiltre[0])
+        setDataCountries(jsonDataCountries)
+        //------------------Données countreprties------------------------------------------------------------------
+        let fechtDataCountrepartieFiltre = create_Data_Countrepartie('6', true, labelSecteur, '8');
+        setDataCountreparties(fechtDataCountrepartieFiltre)
+        setStatutSecteur(false)
+      } else {
+        let fetchDataSecteur = creatData('8', true);
+        setDataSecteur({ data: fetchDataSecteur[1], labels: fetchDataSecteur[0] });
+        let fetchDataRating = creatData('9', true);
+        setDataRating({ data: fetchDataRating[1], labels: fetchDataRating[0] })
+
+        let fetchDataCountries = creatData('7', true);
+
+        let jsonDataCountries = stringFyArray(fetchDataCountries[0])
+        setDataCountries(jsonDataCountries);
+        let fetchDataMaturity = calcul_Maturity_Moyenne();
+        setDataMaturity({ data: fetchDataMaturity[0], labels: fetchDataMaturity[1] });
+
+        let fechtDataCountrepartie = create_Data_Countrepartie('6', true);
+        setDataCountreparties(fechtDataCountrepartie)
+        setStatutSecteur(true)
+      }
+    } else {
+      if (statutSecteur) {
+
+      } else {
+
+      }
+    }
+
+
+
+
   }
 
   // cette fonction gère les click sur Actif -----------------------------
@@ -128,35 +181,17 @@ export default function App() {
       newlabels = dataActifs.labels.slice(0);
       newData.splice(dataActifs.labels.indexOf(label), 1, dataActifs.data[dataActifs.labels.indexOf(label)]);
       setDataActif({ data: newData, labels: newlabels });
-      let dataSecteurFiltre = filtreData(label, '8');
-      if (dataSecteurFiltre[1].length < 4) {
-        let i;
-        for (i = dataSecteurFiltre[1].length; i <= 4; i++) {
-          dataSecteurFiltre[1][i] = 0;
-          dataSecteurFiltre[0][i] = '';
-        }
-        setDataSecteur({ data: dataSecteurFiltre[1], labels: dataSecteurFiltre[0] });
-      } else {
-        setDataSecteur({ data: dataSecteurFiltre[1], labels: dataSecteurFiltre[0] });
-      }
-      let dataRatingFiltre = filtreData(label, '9');
-      if (dataRatingFiltre[1].length < 4) {
-        let i;
-        for (i = dataRatingFiltre[1].length; i <= 4; i++) {
-          dataRatingFiltre[1][i] = 0;
-          dataRatingFiltre[0][i] = '';
-        }
-        setDataRating({ data: dataRatingFiltre[1], labels: dataRatingFiltre[0] })
-      } else {
-        setDataRating({ data: dataRatingFiltre[1], labels: dataRatingFiltre[0] })
-      }
-
-
-
+      //--------------------Données Secteur--------------------------------------------------------------------------
+      let dataSecteurFiltre = completLeTableauParDesZero(filtreData(label, '8'), 4);
+      setDataSecteur({ data: dataSecteurFiltre[1], labels: dataSecteurFiltre[0] });
+      //---------------------Données Rating --------------------------------------------------------------------------
+      let dataRatingFiltre = completLeTableauParDesZero(filtreData(label, '9'), 4);
+      setDataRating({ data: dataRatingFiltre[1], labels: dataRatingFiltre[0] })
+      // --------------------Données Géographique ----------------------------------------------- --------------------
       let dataCountriesFiltre = filtreData(label, '7');
       let jsonDataCountries = stringFyArray(dataCountriesFiltre[0])
       setDataCountries(jsonDataCountries)
-
+      //--------------------Données Maturité Moyenne -------------------------------------------------------------
       if (label === "BD") {
         let fetchDataMaturity = calcul_Maturity_Moyenne();
         setDataMaturity({ data: fetchDataMaturity[0], labels: fetchDataMaturity[1] });
@@ -165,12 +200,14 @@ export default function App() {
         dataZero.fill(0, 0, dataZero.length);
         setDataMaturity({ data: dataZero, labels: dataMaturity.labels });
       }
-
+      //------------------Données countreprties ------------------------------------------------------------------
       let fechtDataCountrepartieFiltre = create_Data_Countrepartie('6', true, label);
       setDataCountreparties(fechtDataCountrepartieFiltre)
-
+      //------------------Statut filtre actif => false = un filtre déja en place  ------------------------------------------------------------------
       setStatut(false);
+
     } else {
+      // -------------------Supression du filtre ------------------------------------------------------------------
       setFiltreActif('')
       setDataActif(dataActifs);
       let fetchDataSecteur = creatData('8', true);
