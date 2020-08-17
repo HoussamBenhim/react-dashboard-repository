@@ -172,6 +172,34 @@ export const filtreData = (filtreActif, DataIndex, indiceFiltre) => {
     return [keys, values]
 }
 
+export const doubleFiltre = (filtreActif, filtreSecteur, DataIndex) => {
+    let map = new Map();
+    let somme = 0;
+    let dataSecteur = dataBrut.filter((row) => {
+        somme = somme + parseFloat(row[3]);
+        if (row[1] === filtreActif && row[8] === filtreSecteur) {
+            return row
+        }
+    })
+    //dataSecteur = dataSecteur.sort((a, b) => parseFloat(b[3]) - parseFloat(a[3]))
+
+    let dataActif = dataSecteur.map((row, index) => {
+        if (map.has(row[parseInt(DataIndex)])) {
+            map.set(row[parseInt(DataIndex)], map.get(row[parseInt(DataIndex)]) + parseFloat(row[3]))
+        } else {
+            map.set(row[parseInt(DataIndex)], parseFloat(row[3]))
+        }
+    })
+    const mapSorted = new Map([...map.entries()].sort((a, b) => b[1] - a[1]));
+    let values = Array.from(mapSorted.values()).map(element => Math.abs(element));
+
+    values = values.map(mktVlue => ((mktVlue / somme) * 100).toFixed(2))
+    let keys = Array.from(mapSorted.keys());
+    keys = keys.slice(0, 5);
+    values = values.slice(0, 5);
+
+    return [keys, values]
+}
 
 export const calcul_Maturity_Moyenne = () => {
     let map = new Map();
@@ -200,7 +228,6 @@ export const calcul_Maturity_Moyenne = () => {
     return [values, keys];
 }
 
-
 export const create_Data_Countrepartie = (DataIndex, slice, filtre, indiceFiltreActif) => {
     let map = new Map();
     let somme = 0;
@@ -224,7 +251,6 @@ export const create_Data_Countrepartie = (DataIndex, slice, filtre, indiceFiltre
     let values = Array.from(mapSorted.values());
     // console.log(somme);
     values = values.map(row => [((row[0] / somme) * 100).toFixed(2), row[1]])
-
     let keys = Array.from(mapSorted.keys());
     if (slice) {
         keys = keys.slice(0, 10);
@@ -234,4 +260,35 @@ export const create_Data_Countrepartie = (DataIndex, slice, filtre, indiceFiltre
 
 }
 
+export const doubleFiltreDataContreparties = (DataIndex, slice, filtreActif, filtreSecteur ) => {
+    let map = new Map();
+    let somme = 0;
+    let dataActif = dataBrut.map((row, index) => {
+        somme = somme + parseFloat(row[3]);
+        if (filtreActif && filtreSecteur ) {
+            if (filtreActif === row[1] && filtreSecteur === row[8]  && map.has(row[parseInt(DataIndex)])) {
+                map.set(row[parseInt(DataIndex)], [map.get(row[parseInt(DataIndex)])[0] + parseFloat(row[3]), row[8]])
+            } else if (filtreActif === row[1] && filtreSecteur === row[8]) {
+                map.set(row[parseInt(DataIndex)], [parseFloat(row[3]), row[8]])
+            }
+        } else
+            if (map.has(row[parseInt(DataIndex)])) {
+                map.set(row[parseInt(DataIndex)], [map.get(row[parseInt(DataIndex)])[0] + parseFloat(row[3]), row[8]])
+            } else {
+                map.set(row[parseInt(DataIndex)], [parseFloat(row[3]), row[8]])
+            }
+    })
+    //   
+    const mapSorted = new Map([...map.entries()].sort((a, b) => b[1][0] - a[1][0]));
+    let values = Array.from(mapSorted.values());
+    // console.log(somme);
+    values = values.map(row => [((row[0] / somme) * 100).toFixed(2), row[1]])
+    let keys = Array.from(mapSorted.keys());
+    if (slice) {
+        keys = keys.slice(0, 10);
+        values = values.slice(0, 10);
+    }
+    return [keys, values];
+
+}
 

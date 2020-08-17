@@ -14,7 +14,7 @@ import GeoChart from './Chart/GeoChart'
 import Geodata from './Chart/custom.json'
 import ScrRatingChart from './Chart/ScrCahrt'
 import { creatDataActifs as loadDataActif } from './API';
-import { creatData, filtreData, calcul_Maturity_Moyenne, create_Data_Countrepartie } from './API'
+import { creatData, filtreData, calcul_Maturity_Moyenne, create_Data_Countrepartie, doubleFiltre,doubleFiltreDataContreparties } from './API'
 
 
 
@@ -124,6 +124,7 @@ export default function App() {
     newlabels = dataSecteur.labels.slice(0);
     newData.splice(dataSecteur.labels.indexOf(labelSecteur), 1, dataSecteur.data[dataSecteur.labels.indexOf(labelSecteur)]);
     setDataSecteur({ data: newData, labels: newlabels });
+    //-----si aucun filtre classe d'actif est selectionné --------------------
     if (statut) {
       if (statutSecteur) {
         let dataSecteurFiltre = completLeTableauParDesZero(filtreData(labelSecteur, '8', '8'), 4);
@@ -135,7 +136,7 @@ export default function App() {
         let dataCountriesFiltre = filtreData(labelSecteur, '7', '8');
         let jsonDataCountries = stringFyArray(dataCountriesFiltre[0])
         setDataCountries(jsonDataCountries)
-        //------------------Données countreprties------------------------------------------------------------------
+        //------------------Données contreprties------------------------------------------------------------------
         let fechtDataCountrepartieFiltre = create_Data_Countrepartie('6', true, labelSecteur, '8');
         setDataCountreparties(fechtDataCountrepartieFiltre)
         setStatutSecteur(false)
@@ -156,11 +157,25 @@ export default function App() {
         setDataCountreparties(fechtDataCountrepartie)
         setStatutSecteur(true)
       }
+      //------si un filtre classe d'actif est actif----------------------------------
     } else {
       if (statutSecteur) {
+        let dataSecteurFiltre = completLeTableauParDesZero(filtreData(labelSecteur, '8', '8'), 4);
+        setDataSecteur({ data: dataSecteurFiltre[1], labels: dataSecteurFiltre[0] });
 
+        let dataRatingFiltre = completLeTableauParDesZero(doubleFiltre(filtreActif, labelSecteur, '9'), 4);
+        setDataRating({ data: dataRatingFiltre[1], labels: dataRatingFiltre[0] })
+
+        let dataCountriesFiltre = doubleFiltre(filtreActif, labelSecteur, '7');
+        let jsonDataCountries = stringFyArray(dataCountriesFiltre[0])
+        setDataCountries(jsonDataCountries)
+
+        let fechtDataCountrepartie = doubleFiltreDataContreparties('6', true,filtreActif, labelSecteur);
+        setDataCountreparties(fechtDataCountrepartie)
+        setStatutSecteur(false)
       } else {
 
+        setStatutSecteur(true)
       }
     }
 
