@@ -30,25 +30,6 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-/*------------------------creation données -------------------------*/
-// function createData(Entreprise, Exposition, Secteur, key) {
-//   return { Entreprise, Exposition, Secteur, key };
-// }
-
-// const rows = [
-//   createData('RECKITT BENCKISER GROUP PLC', '3.37%', 'Activités des services financiers', 0),
-//   createData('AIR LIQUIDE', '3.34%', 'Industrie chimique', 1),
-//   createData('DNCA FINANCE LUXEMBOURG', '3.24%', 'DNCA FINANCE LUXEMBOURG', 3),
-//   createData('RECKITT BENCKISER GROUP PLC', '3.37%', 'Activités des services financiers', 4),
-//   createData('AIR LIQUIDE', '3.34%', 'Industrie chimique', 5),
-//   createData('DNCA FINANCE LUXEMBOURG', '3.24%', 'DNCA FINANCE LUXEMBOURG', 6),
-//   createData('AIR LIQUIDE', '3.34%', 'Industrie chimique', 7),
-//   createData('DNCA FINANCE LUXEMBOURG', '3.24%', 'DNCA FINANCE LUXEMBOURG', 8),
-//   createData('RECKITT BENCKISER GROUP PLC', '3.37%', 'Activités des services financiers', 9),
-//   createData('AIR LIQUIDE', '3.34%', 'Industrie chimique', 10),
-//   createData('DNCA FINANCE LUXEMBOURG', '3.24%', 'DNCA FINANCE LUXEMBOURG', 11),
-//   createData('RECKITT BENCKISER GROUP PLC', '3.37%', 'Activités des services financiers', 12),
-// ];
 
 function stringFyArray(array) {
   var jsonCountriesArray = {};
@@ -174,6 +155,37 @@ export default function App() {
         setDataCountreparties(fechtDataCountrepartie)
         setStatutSecteur(false)
       } else {
+        let newData = new Array(dataActifs.data.length);
+      let newlabels = new Array(dataActifs.data.length);
+      // on complète par des '0'
+      newData.fill(0, 0, newData.length);
+      newlabels = dataActifs.labels.slice(0);
+      newData.splice(dataActifs.labels.indexOf(filtreActif), 1, dataActifs.data[dataActifs.labels.indexOf(filtreActif)]);
+      setDataActif({ data: newData, labels: newlabels });
+      //--------------------Données Secteur--------------------------------------------------------------------------
+      let dataSecteurFiltre = completLeTableauParDesZero(filtreData(filtreActif, '8'), 4);
+      setDataSecteur({ data: dataSecteurFiltre[1], labels: dataSecteurFiltre[0] });
+      //---------------------Données Rating --------------------------------------------------------------------------
+      let dataRatingFiltre = completLeTableauParDesZero(filtreData(filtreActif, '9'), 4);
+      setDataRating({ data: dataRatingFiltre[1], labels: dataRatingFiltre[0] })
+      // --------------------Données Géographique ----------------------------------------------- --------------------
+      let dataCountriesFiltre = filtreData(filtreActif, '7');
+      let jsonDataCountries = stringFyArray(dataCountriesFiltre[0])
+      setDataCountries(jsonDataCountries)
+      //--------------------Données Maturité Moyenne -------------------------------------------------------------
+      if (filtreActif === "BD") {
+        let fetchDataMaturity = calcul_Maturity_Moyenne();
+        setDataMaturity({ data: fetchDataMaturity[0], labels: fetchDataMaturity[1] });
+      } else {
+        let dataZero = new Array(dataMaturity.labels.length);
+        dataZero.fill(0, 0, dataZero.length);
+        setDataMaturity({ data: dataZero, labels: dataMaturity.labels });
+      }
+      //------------------Données countreprties ------------------------------------------------------------------
+      let fechtDataCountrepartieFiltre = create_Data_Countrepartie('6', true, filtreActif);
+      setDataCountreparties(fechtDataCountrepartieFiltre)
+      //------------------Statut filtre actif => false = un filtre déja en place  ------------------------------------------------------------------
+      setStatut(false);
 
         setStatutSecteur(true)
       }
