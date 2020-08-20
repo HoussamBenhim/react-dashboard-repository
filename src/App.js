@@ -14,7 +14,7 @@ import GeoChart from './Chart/GeoChart'
 import Geodata from './Chart/custom.json'
 import ScrRatingChart from './Chart/ScrCahrt'
 import { creatDataActifs as loadDataActif } from './API';
-import { creatData, filtreData, calcul_Maturity_Moyenne, create_Data_Countrepartie, doubleFiltre,doubleFiltreDataContreparties } from './API'
+import { creatData, filtreData, calcul_Maturity_Moyenne, create_Data_Countrepartie, doubleFiltre, doubleFiltreDataContreparties } from './API'
 
 
 
@@ -50,6 +50,8 @@ export default function App() {
   const [property, setProperty] = useState('wb_a2');
   const [dataActifs, setDataActifs] = useState({ data: [0, 0, 0], labels: ['', '', ''] });
   const [dataActif, setDataActif] = useState({ data: [0, 0, 0], labels: ['', '', ''] });
+  const [colorActif, setColorActif] = useState('');
+  const [colorSecteur, setcolorSecteur] = useState('');
   const [statut, setStatut] = useState(true);
   const [statutSecteur, setStatutSecteur] = useState(true);
   const [dataSecteur, setDataSecteur] = useState({ data: [0, 0, 0, 0, 0], labels: ['', '', '', '', ''] })
@@ -95,8 +97,8 @@ export default function App() {
   }
 
   //la fonction gère les clicks sur secteurs -------------------------------------
-  const handelClickSecteur = (labelSecteur) => {
-    setFiltreSecteur(labelSecteur)
+  const handelClickSecteur = (labelSecteur, colorSecteur) => {
+    
 
     let newData = new Array(dataSecteur.data.length);
     let newlabels = new Array(dataSecteur.data.length);
@@ -108,6 +110,8 @@ export default function App() {
     //-----si aucun filtre classe d'actif est selectionné --------------------
     if (statut) {
       if (statutSecteur) {
+        setcolorSecteur(colorSecteur)
+        setFiltreSecteur(labelSecteur)
         let dataSecteurFiltre = completLeTableauParDesZero(filtreData(labelSecteur, '8', '8'), 4);
         setDataSecteur({ data: dataSecteurFiltre[1], labels: dataSecteurFiltre[0] });
 
@@ -122,6 +126,7 @@ export default function App() {
         setDataCountreparties(fechtDataCountrepartieFiltre)
         setStatutSecteur(false)
       } else {
+        setFiltreSecteur('')
         let fetchDataSecteur = creatData('8', true);
         setDataSecteur({ data: fetchDataSecteur[1], labels: fetchDataSecteur[0] });
         let fetchDataRating = creatData('9', true);
@@ -141,6 +146,8 @@ export default function App() {
       //------si un filtre classe d'actif est actif----------------------------------
     } else {
       if (statutSecteur) {
+        setcolorSecteur(colorSecteur)
+        setFiltreSecteur(labelSecteur)
         let dataSecteurFiltre = completLeTableauParDesZero(filtreData(labelSecteur, '8', '8'), 4);
         setDataSecteur({ data: dataSecteurFiltre[1], labels: dataSecteurFiltre[0] });
 
@@ -151,41 +158,42 @@ export default function App() {
         let jsonDataCountries = stringFyArray(dataCountriesFiltre[0])
         setDataCountries(jsonDataCountries)
 
-        let fechtDataCountrepartie = doubleFiltreDataContreparties('6', true,filtreActif, labelSecteur);
+        let fechtDataCountrepartie = doubleFiltreDataContreparties('6', true, filtreActif, labelSecteur);
         setDataCountreparties(fechtDataCountrepartie)
         setStatutSecteur(false)
       } else {
+        setFiltreSecteur('')
         let newData = new Array(dataActifs.data.length);
-      let newlabels = new Array(dataActifs.data.length);
-      // on complète par des '0'
-      newData.fill(0, 0, newData.length);
-      newlabels = dataActifs.labels.slice(0);
-      newData.splice(dataActifs.labels.indexOf(filtreActif), 1, dataActifs.data[dataActifs.labels.indexOf(filtreActif)]);
-      setDataActif({ data: newData, labels: newlabels });
-      //--------------------Données Secteur--------------------------------------------------------------------------
-      let dataSecteurFiltre = completLeTableauParDesZero(filtreData(filtreActif, '8'), 4);
-      setDataSecteur({ data: dataSecteurFiltre[1], labels: dataSecteurFiltre[0] });
-      //---------------------Données Rating --------------------------------------------------------------------------
-      let dataRatingFiltre = completLeTableauParDesZero(filtreData(filtreActif, '9'), 4);
-      setDataRating({ data: dataRatingFiltre[1], labels: dataRatingFiltre[0] })
-      // --------------------Données Géographique ----------------------------------------------- --------------------
-      let dataCountriesFiltre = filtreData(filtreActif, '7');
-      let jsonDataCountries = stringFyArray(dataCountriesFiltre[0])
-      setDataCountries(jsonDataCountries)
-      //--------------------Données Maturité Moyenne -------------------------------------------------------------
-      if (filtreActif === "BD") {
-        let fetchDataMaturity = calcul_Maturity_Moyenne();
-        setDataMaturity({ data: fetchDataMaturity[0], labels: fetchDataMaturity[1] });
-      } else {
-        let dataZero = new Array(dataMaturity.labels.length);
-        dataZero.fill(0, 0, dataZero.length);
-        setDataMaturity({ data: dataZero, labels: dataMaturity.labels });
-      }
-      //------------------Données countreprties ------------------------------------------------------------------
-      let fechtDataCountrepartieFiltre = create_Data_Countrepartie('6', true, filtreActif);
-      setDataCountreparties(fechtDataCountrepartieFiltre)
-      //------------------Statut filtre actif => false = un filtre déja en place  ------------------------------------------------------------------
-      setStatut(false);
+        let newlabels = new Array(dataActifs.data.length);
+        // on complète par des '0'
+        newData.fill(0, 0, newData.length);
+        newlabels = dataActifs.labels.slice(0);
+        newData.splice(dataActifs.labels.indexOf(filtreActif), 1, dataActifs.data[dataActifs.labels.indexOf(filtreActif)]);
+        setDataActif({ data: newData, labels: newlabels });
+        //--------------------Données Secteur--------------------------------------------------------------------------
+        let dataSecteurFiltre = completLeTableauParDesZero(filtreData(filtreActif, '8'), 4);
+        setDataSecteur({ data: dataSecteurFiltre[1], labels: dataSecteurFiltre[0] });
+        //---------------------Données Rating --------------------------------------------------------------------------
+        let dataRatingFiltre = completLeTableauParDesZero(filtreData(filtreActif, '9'), 4);
+        setDataRating({ data: dataRatingFiltre[1], labels: dataRatingFiltre[0] })
+        // --------------------Données Géographique ----------------------------------------------- --------------------
+        let dataCountriesFiltre = filtreData(filtreActif, '7');
+        let jsonDataCountries = stringFyArray(dataCountriesFiltre[0])
+        setDataCountries(jsonDataCountries)
+        //--------------------Données Maturité Moyenne -------------------------------------------------------------
+        if (filtreActif === "BD") {
+          let fetchDataMaturity = calcul_Maturity_Moyenne();
+          setDataMaturity({ data: fetchDataMaturity[0], labels: fetchDataMaturity[1] });
+        } else {
+          let dataZero = new Array(dataMaturity.labels.length);
+          dataZero.fill(0, 0, dataZero.length);
+          setDataMaturity({ data: dataZero, labels: dataMaturity.labels });
+        }
+        //------------------Données countreprties ------------------------------------------------------------------
+        let fechtDataCountrepartieFiltre = create_Data_Countrepartie('6', true, filtreActif);
+        setDataCountreparties(fechtDataCountrepartieFiltre)
+        //------------------Statut filtre actif => false = un filtre déja en place  ------------------------------------------------------------------
+        setStatut(false);
 
         setStatutSecteur(true)
       }
@@ -198,8 +206,9 @@ export default function App() {
 
   // cette fonction gère les click sur Actif -----------------------------
 
-  const handelClickActif = (label) => {
+  const handelClickActif = (label, backgroundColor) => {
     setFiltreActif(label)
+    setColorActif(backgroundColor);
     if (statut) {
       let newData = new Array(dataActifs.data.length);
       let newlabels = new Array(dataActifs.data.length);
@@ -265,7 +274,7 @@ export default function App() {
       <Header />
       <Grid className={classes.root} direction="row" justify="center" alignItems="center" container spacing={1}>
         <Grid item xs={12} className={classes.item}  >
-          <Paper labelAactif={filtreActif} handelClickActif={handelClickActif} />
+          <Paper labelAactif={filtreActif} handelClickActif={handelClickActif} handelClickSecteur={handelClickSecteur} labelSecteur={filtreSecteur} colorActif={colorActif} colorSecteur ={colorSecteur}  />
         </Grid>
         <Grid item xs={12} sm={10} md={5} lg={3} >
           {dataActifs.data.length > 0 ? <Box Tittle={'Classes d\'Actifs'} content={<DoughnutChart datas={dataActif} handelClickActif={handelClickActif} />} /> : <Box Tittle={'... Data Loading'} />}

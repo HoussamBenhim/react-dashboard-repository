@@ -2,6 +2,8 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Chip from '@material-ui/core/Chip';
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import { green, orange } from '@material-ui/core/colors';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -48,31 +50,49 @@ const mapLabelActif = {
 
 }
 
+const Theme = (color, colorSecteur) => createMuiTheme({
+    
+    palette: {
+        primary: {
+            main: color,
+        },
+        secondary: {
+            main: colorSecteur,
+        },
+    },
+});
 
-export default function SimplePaper({ labelAactif , handelClickActif}) {
+export default function SimplePaper({ labelAactif, labelSecteur, handelClickActif, handelClickSecteur,colorActif, colorSecteur }) {
     const classes = useStyles();
     const handleDelete = () => {
         handelClickActif();
     };
+    const handleDeleteSecteur = () => {
+        handelClickSecteur();
+    };
     return (
 
         <div className={classes.root}>
-            <Paper elevation={24} variant="outlined" className={classes.container} >
-                
-                <Chip
-                    className={classes.chip}
-                    label={mapLabelActif[labelAactif].label}
-                    disabled = {labelAactif !== '' ? false :  true}
-                    color ={labelAactif !== '' ? 'primary' : 'default'}
-                    onDelete={handleDelete}
-                />
-                <Chip
-                    className={classes.chip}
-                    disabled
-                    label=""
-                    onDelete={handleDelete}
-                />
-            </Paper>
+            <ThemeProvider theme={Theme(colorActif ? colorActif : 'rgb(182,197,18)', colorSecteur ? colorSecteur : 'rgb(182,197,18)' ) }>
+                <Paper elevation={24} variant="outlined" className={classes.container} >
+
+                    <Chip
+                        className={classes.chip}
+                        label={mapLabelActif[labelAactif].label}
+                        disabled={labelAactif !== '' ? false : true}
+                        color={labelAactif !== '' ? 'primary' : 'default'}
+                        onDelete={handleDelete}
+                    />
+
+                    <Chip
+                        className={classes.chip}
+                        label={labelSecteur}
+                        disabled={labelSecteur !== '' ? false : true}
+                        color={labelSecteur !== '' ? 'primary' : 'default'}
+                        onDelete={handleDeleteSecteur}
+                    />
+                </Paper>
+            </ThemeProvider>
         </div>
     );
 }

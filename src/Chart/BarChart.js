@@ -1,7 +1,7 @@
 import React, { Component, useEffect, useState } from 'react';
 import { HorizontalBar } from 'react-chartjs-2';
 
-export default function BarChart({ datas: { data, labels }, handelClickSecteur }) {
+export default function BarChart({ datas: { data, labels }, handelClickSecteur , colorSecteur}) {
 
     const [donnee, setData] = useState([]);
     const [liblles, setLabels] = useState([]);
@@ -36,7 +36,7 @@ export default function BarChart({ datas: { data, labels }, handelClickSecteur }
                 width={70}
                 height={35}
                 getElementsAtEvent={dataset => {
-                    dataset.length ? handelClickSecteur(dataset[0]._model.label) : console.log('Empty array');
+                    dataset.length ? handelClickSecteur(dataset[0]._model.label, dataset[0]._model.backgroundColor) : console.log('Empty array');
                 }}
                 options={{
                     maintainAspectRatio: false,

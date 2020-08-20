@@ -47,7 +47,7 @@ export default function DoughnutChart({ datas :{data, labels},  handelClickActif
 
                 }}
                 getElementsAtEvent={dataset => {
-                    dataset.length ? handelClickActif(dataset[0]._model.label) : console.log('Empty array');
+                    dataset.length ? handelClickActif(dataset[0]._model.label, dataset[0]._model.backgroundColor) : console.log('Empty array');
                 }}
 
                 options={{
