@@ -14,17 +14,17 @@ import Box from './Composition/Box/Box';
 import DeleteIcon from '@material-ui/icons/Delete';
 
 const useStyles = makeStyles((theme) => ({
-/*   Tittle: {
-    fontSize: 20,
-    margin: 'auto',
-    padding: 0,
-    fontFamily: 'Helvetica Neue',
-    textAlign: 'center',
-    color: 'rgb(204, 255, 51)',
-    paddingRight: '40px',
-
-  }, */
-   root: {
+  /*   Tittle: {
+      fontSize: 20,
+      margin: 'auto',
+      padding: 0,
+      fontFamily: 'Helvetica Neue',
+      textAlign: 'center',
+      color: 'rgb(204, 255, 51)',
+      paddingRight: '40px',
+  
+    }, */
+  root: {
     '& > *': {
       flexGrow: 1,
       maxWidth: '1500px',
@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
       padding: '0px',
     },
   },
- 
+
   input: {
     background: 'white',
     color: 'red',
@@ -64,7 +64,7 @@ export default function Portefeuille() {
   const classes = useStyles();
 
   const [value, setValue] = React.useState(listPortefeuille[0]);
-  const [listSelectPortefeuille, setList] = React.useState(Array);
+  const [listSelectPortefeuille, setList] = React.useState([]);
   const [selectedIndex, setSelectIndex] = React.useState('');
 
   const addToListSelectPortefeuille = (event, newPortefeuille) => {
@@ -73,11 +73,17 @@ export default function Portefeuille() {
         return;
       }
     }
-    listSelectPortefeuille.push(newPortefeuille);
-  }
+    setList(listSelectPortefeuille => listSelectPortefeuille.concat(newPortefeuille));
+}
 
-  const deleteToListPortefeuille= (index) => {
-    listSelectPortefeuille.splice(index, 1);
+  const deleteToListPortefeuille = (id) => {
+    for (let i = 0; i < listSelectPortefeuille.length; i++) {
+      if (id === listSelectPortefeuille[i].id && selectedIndex === i) {
+        setSelectIndex(0);
+      }
+    }
+    const newList = listSelectPortefeuille.filter((item) => item.id !== id);
+    setList(newList);
   }
 
   const handleListPortefeuileClick = (event, indexPortefeuille) => {
@@ -88,6 +94,7 @@ export default function Portefeuille() {
     <div>
 
       <h1>Portefeuille Tifaine</h1>
+
 
       <Grid className={classes.root} direction="row" justify="center" alignItems="center" container spacing={1}>
 
@@ -114,38 +121,38 @@ export default function Portefeuille() {
             </Grid>
 
             <Grid item>
-              <Button variant="contained" color="primary" onClick={(event) => addToListSelectPortefeuille(event, value)}  >
-                Select
-              </Button>
+              <Button variant="contained" color='primary' onClick={(event) => addToListSelectPortefeuille(event, value)} > Select </Button>
             </Grid>
 
           </Grid>
 
           <Box Tittle={'Portefeuilles selectionnés'} content={
-              <List>
-                {listSelectPortefeuille.map((item, index) => (
-                  <ListItem
-                    button
-                    selected={selectedIndex === index}
-                    onClick={(event) => handleListPortefeuileClick(event, index)}
-                  > 
-                    <ListItemText primary={listSelectPortefeuille[index].title} />
-                    <ListItemSecondaryAction>
-                      <IconButton edge="end">
-                        <DeleteIcon onClick={() => deleteToListPortefeuille(index)} />
-                      </IconButton>
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                ))}
-              </List>
-          } /> 
+            <List>
+              {listSelectPortefeuille.length >= 1 ? listSelectPortefeuille.map((item, index) => (
+
+                <ListItem
+                  key={item.id}
+                  button
+                  selected={selectedIndex === index}
+                  onClick={(event) => handleListPortefeuileClick(event, index)}
+                >
+                  <ListItemText primary={item.title} />
+                  <ListItemSecondaryAction>
+                    <IconButton edge="end" onClick={(event) => deleteToListPortefeuille(item.id)} >
+                      <DeleteIcon />
+                    </IconButton>
+                  </ListItemSecondaryAction>
+                </ListItem>
+              )) : ''}
+            </List>
+          } />
 
         </Grid>
 
         <Grid item>
           <Box Tittle={'information'} content={
             <p>
-              Portefeuille Sélectionné : {selectedIndex ? listSelectPortefeuille[selectedIndex].title : 'none'} 
+              Portefeuille Sélectionné : {selectedIndex ? listSelectPortefeuille[selectedIndex].title : 'none'}
 
               Pays : {selectedIndex ? listSelectPortefeuille[selectedIndex].pays : 'none'}
 
