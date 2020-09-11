@@ -42,8 +42,6 @@ const useStyles = makeStyles((theme) => ({
 
   input: {
     background: 'white',
-    color: 'red',
-    WebkitTextFillColor: 'green',
 
   },
 
@@ -65,7 +63,7 @@ export default function Portefeuille() {
 
   const [value, setValue] = React.useState(listPortefeuille[0]);
   const [listSelectPortefeuille, setList] = React.useState([]);
-  const [selectedIndex, setSelectIndex] = React.useState('');
+  const [selectedIndex, setSelectIndex] = React.useState(0);
 
   const addToListSelectPortefeuille = (event, newPortefeuille) => {
     for (let i = 0; i < listSelectPortefeuille.length; i++) {
@@ -113,9 +111,10 @@ export default function Portefeuille() {
 
                 id="barre-de-recherche"
                 options={listPortefeuille}
+                
                 getOptionLabel={(option) => option.title}
                 defaultValue={[Portefeuille[0]]}
-                style={{ width: 300, color: 'rgb(32,42, 59)' }}
+                style={{ width: 300, color: 'red' }}
                 renderInput={(params) => <TextField color="primary" {...params} label="Combo box" variant="outlined" />}
               />
             </Grid>
@@ -152,9 +151,9 @@ export default function Portefeuille() {
         <Grid item>
           <Box Tittle={'information'} content={
             <p>
-              Portefeuille Sélectionné : {selectedIndex ? listSelectPortefeuille[selectedIndex].title : 'none'}
+              Portefeuille Sélectionné : {( listSelectPortefeuille.length >= 1 && selectedIndex >= 0 ) ? listSelectPortefeuille[selectedIndex].title : 'none'}
 
-              Pays : {selectedIndex ? listSelectPortefeuille[selectedIndex].pays : 'none'}
+              Pays : {( listSelectPortefeuille.length >= 1 && selectedIndex >= 0 ) ? listSelectPortefeuille[selectedIndex].pays : 'none'}
 
             </p>
           } />
